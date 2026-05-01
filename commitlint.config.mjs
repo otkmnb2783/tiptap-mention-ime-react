@@ -1,0 +1,97 @@
+// @ts-check
+/** @type {import('cz-git').UserConfig} */
+export default {
+  extends: ["@commitlint/config-conventional"],
+
+  parserPreset: {
+    parserOpts: {
+      // 例: "✨ feat(scope): subject" / "feat(scope): subject" 両対応
+      headerPattern:
+        /^(?:(\p{Extended_Pictographic}|\p{Emoji_Presentation})\s)?(\w+)(?:\(([^)]+)\))?!?:\s(.+)$/u,
+      headerCorrespondence: ["emoji", "type", "scope", "subject"],
+    },
+  },
+
+  rules: {
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "build",
+        "ci",
+        "chore",
+        "revert",
+      ],
+    ],
+    "subject-case": [0],
+    "subject-empty": [2, "never"],
+    "type-empty": [2, "never"],
+    "type-case": [2, "always", "lower-case"],
+    "header-max-length": [2, "always", 125],
+  },
+
+  prompt: {
+    alias: { fd: "docs: 📝 fix typos" },
+    messages: {
+      type: "コミットの種類を選択:",
+      scope: "スコープ (任意):",
+      customScope: "スコープを入力:",
+      subject: "変更内容を簡潔に:\n",
+      body: '本文 (任意・"|" で改行):\n',
+      breaking: "破壊的変更 (任意):\n",
+      footerPrefixesSelect: "Issue 関連プレフィックス:",
+      customFooterPrefix: "プレフィックスを入力:",
+      footer: "関連 Issue (例: #31, #34):\n",
+      generatingByAI: "AI で生成中...",
+      generatedSelectByAI: "AI 生成案から選択:",
+      confirmCommit: "これでコミットしますか?",
+    },
+    types: [
+      { value: "feat", name: "feat:     ✨ 新機能", emoji: "✨" },
+      { value: "fix", name: "fix:      🐛 バグ修正", emoji: "🐛" },
+      { value: "docs", name: "docs:     📝 ドキュメント", emoji: "📝" },
+      { value: "style", name: "style:    💄 整形", emoji: "💄" },
+      { value: "refactor", name: "refactor: ♻️  リファクタ", emoji: "♻️" },
+      { value: "perf", name: "perf:     ⚡️ パフォーマンス", emoji: "⚡️" },
+      { value: "test", name: "test:     ✅ テスト", emoji: "✅" },
+      { value: "build", name: "build:    📦️ ビルド・依存", emoji: "📦️" },
+      { value: "ci", name: "ci:       👷 CI 設定", emoji: "👷" },
+      { value: "chore", name: "chore:    🔧 雑務", emoji: "🔧" },
+      { value: "revert", name: "revert:   ⏪️ リバート", emoji: "⏪️" },
+    ],
+    useEmoji: true,
+    emojiAlign: "center",
+    themeColorCode: "",
+    scopes: [],
+    allowCustomScopes: true,
+    allowEmptyScopes: true,
+    customScopesAlign: "bottom",
+    upperCaseSubject: false,
+    markBreakingChangeMode: false,
+    allowBreakingChanges: ["feat", "fix"],
+    breaklineNumber: 100,
+    breaklineChar: "|",
+    skipQuestions: [],
+    issuePrefixes: [
+      { value: "closed", name: "closed: ISSUES has been processed" },
+    ],
+    customIssuePrefixAlign: "top",
+    emptyIssuePrefixAlias: "skip",
+    customIssuePrefixAlias: "custom",
+    allowCustomIssuePrefix: true,
+    allowEmptyIssuePrefix: true,
+    confirmColorize: true,
+    scopeOverrides: undefined,
+    defaultBody: "",
+    defaultIssues: "",
+    defaultScope: "",
+    defaultSubject: "",
+  },
+};
