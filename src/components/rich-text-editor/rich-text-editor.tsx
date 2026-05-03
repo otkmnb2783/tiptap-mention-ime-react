@@ -1,24 +1,38 @@
 "use client";
 
+import Mention from "@tiptap/extension-mention";
 import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
+
+import { mentionItems } from "@/lib/mention-items";
 import { buildExtensions } from "@/lib/rich-text-extensions";
 import { cn } from "@/lib/utils";
+
+import { createMentionSuggestion } from "./mention/suggestion";
 import { Toolbar } from "./toolbar";
 
 export interface RichTextEditorProps {
+  className?: string;
   content: JSONContent;
   onChange: (json: JSONContent) => void;
-  className?: string;
 }
 
 export function RichTextEditor({
+  className,
   content,
   onChange,
-  className,
 }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: buildExtensions(),
+    extensions: buildExtensions({
+      additionalExtensions: [
+        Mention.configure({
+          HTMLAttributes: {
+            class: "mention",
+          },
+          suggestion: createMentionSuggestion(mentionItems),
+        }),
+      ],
+    }),
     content,
     immediatelyRender: false,
     editorProps: {

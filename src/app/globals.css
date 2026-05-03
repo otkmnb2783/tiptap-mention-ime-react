@@ -128,3 +128,11 @@
     @apply font-sans;
   }
 }
+
+.mention {
+  border-radius: 0.25rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.05rem 0.25rem;
+  font-weight: 500;
+}
