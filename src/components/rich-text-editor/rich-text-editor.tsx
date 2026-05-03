@@ -1,16 +1,16 @@
 "use client";
 
-import Mention from "@tiptap/extension-mention";
-import type { JSONContent } from "@tiptap/react";
+import type { Editor, JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useMentionUsers } from "@/hooks/use-mention-users";
 import type { MentionUser } from "@/lib/mention-users";
 import { buildExtensions } from "@/lib/rich-text-extensions";
 import { cn } from "@/lib/utils";
 
-import { createMentionSuggestion } from "./mention/suggestion";
+import type { ImeMentionController } from "./mention/suggestion";
+import { buildMentionExtensions } from "./plugins/build-mention-extension";
 import { Toolbar } from "./toolbar";
 
 export interface RichTextEditorProps {
@@ -24,6 +24,8 @@ export function RichTextEditor({
   content,
   onChange,
 }: RichTextEditorProps) {
+  const editorRef = useRef<Editor | null>(null);
+  const imeControllerRef = useRef<ImeMentionController | null>(null);
   const mentionUsersRef = useRef<MentionUser[]>([]);
   const { error, isLoading, users } = useMentionUsers();
 
@@ -31,16 +33,17 @@ export function RichTextEditor({
     mentionUsersRef.current = users;
   }, [users]);
 
+  const mentionExtensions = useMemo(() => {
+    return buildMentionExtensions({
+      editorRef,
+      getUsers: () => mentionUsersRef.current,
+      imeControllerRef,
+    });
+  }, []);
+
   const editor = useEditor({
     extensions: buildExtensions({
-      additionalExtensions: [
-        Mention.configure({
-          HTMLAttributes: {
-            class: "mention",
-          },
-          suggestion: createMentionSuggestion(() => mentionUsersRef.current),
-        }),
-      ],
+      additionalExtensions: mentionExtensions,
     }),
     content,
     immediatelyRender: false,
@@ -54,6 +57,18 @@ export function RichTextEditor({
       onChange(editor.getJSON());
     },
   });
+
+  useEffect(() => {
+    editorRef.current = editor;
+
+    return () => {
+      if (editorRef.current !== editor) return;
+
+      imeControllerRef.current?.hide();
+      imeControllerRef.current = null;
+      editorRef.current = null;
+    };
+  }, [editor]);
 
   return (
     <div

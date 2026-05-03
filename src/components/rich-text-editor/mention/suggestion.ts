@@ -1,4 +1,5 @@
 import { computePosition, flip, offset, shift } from "@floating-ui/dom";
+import type { Editor } from "@tiptap/react";
 import { ReactRenderer } from "@tiptap/react";
 import type {
   SuggestionKeyDownProps,
@@ -11,12 +12,34 @@ import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 
 import MentionList, { type MentionListRef } from "./mention-list";
 
-async function updatePosition(
-  element: HTMLElement,
-  clientRect: (() => DOMRect | null) | null | undefined,
-) {
-  const rect = clientRect?.();
+interface MentionCommandAttrs {
+  id: string;
+  label: string;
+}
 
+interface ImeMentionControllerShowOptions {
+  onSelect: (attrs: MentionCommandAttrs) => void;
+  query: string;
+  rect: DOMRect;
+  users: MentionUser[];
+}
+
+function filterMentionUsers(users: MentionUser[], query: string) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) return users.slice(0, 10);
+
+  return users
+    .filter((user) => {
+      return (
+        user.name.toLowerCase().includes(normalizedQuery) ||
+        user.username.toLowerCase().includes(normalizedQuery)
+      );
+    })
+    .slice(0, 10);
+}
+
+async function updatePosition(element: HTMLElement, rect: DOMRect | null) {
   if (!rect) return;
 
   const virtualElement = {
@@ -42,19 +65,89 @@ async function updatePosition(
   element.style.zIndex = "50";
 }
 
-function filterMentionUsers(users: MentionUser[], query: string) {
-  const normalizedQuery = query.trim().toLowerCase();
+function getClientRect(clientRect: (() => DOMRect | null) | null | undefined) {
+  return clientRect?.() ?? null;
+}
 
-  if (!normalizedQuery) return users.slice(0, 10);
+export class ImeMentionController {
+  private component: ReactRenderer<MentionListRef> | null = null;
+  private latestRect: DOMRect | null = null;
+  private rafId = 0;
+  private resizeObserver: ResizeObserver | null = null;
 
-  return users
-    .filter((user) => {
-      return (
-        user.name.toLowerCase().includes(normalizedQuery) ||
-        user.username.toLowerCase().includes(normalizedQuery)
+  constructor(private editor: Editor) {}
+
+  private schedulePositionUpdate() {
+    if (!this.component) return;
+
+    cancelAnimationFrame(this.rafId);
+
+    this.rafId = requestAnimationFrame(() => {
+      if (!this.component) return;
+
+      void updatePosition(
+        this.component.element as HTMLElement,
+        this.latestRect,
       );
-    })
-    .slice(0, 10);
+    });
+  }
+
+  show({ onSelect, query, rect, users }: ImeMentionControllerShowOptions) {
+    this.latestRect = rect;
+
+    const props = {
+      command: onSelect,
+      items: filterMentionUsers(users, query),
+    };
+
+    if (this.component) {
+      this.component.updateProps(props);
+      this.schedulePositionUpdate();
+      return;
+    }
+
+    lockScroll();
+
+    this.component = new ReactRenderer(MentionList, {
+      editor: this.editor,
+      props,
+    });
+
+    const element = this.component.element as HTMLElement;
+    element.style.pointerEvents = "auto";
+    element.style.position = "fixed";
+    element.style.visibility = "hidden";
+
+    document.body.appendChild(element);
+
+    if (typeof ResizeObserver !== "undefined") {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.schedulePositionUpdate();
+      });
+      this.resizeObserver.observe(element);
+    }
+
+    this.schedulePositionUpdate();
+  }
+
+  hide() {
+    cancelAnimationFrame(this.rafId);
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+    this.latestRect = null;
+    unlockScroll();
+    this.component?.destroy();
+    this.component?.element.remove();
+    this.component = null;
+  }
+
+  isVisible() {
+    return this.component !== null;
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    return this.component?.ref?.onKeyDown({ event }) ?? false;
+  }
 }
 
 export function createMentionSuggestion(
@@ -84,7 +177,7 @@ export function createMentionSuggestion(
 
           void updatePosition(
             component.element as HTMLElement,
-            latestClientRect,
+            getClientRect(latestClientRect),
           );
         });
       };
