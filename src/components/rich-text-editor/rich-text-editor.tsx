@@ -2,22 +2,28 @@
 
 import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { buildExtensions } from "@/lib/rich-text-extensions";
+import { cn } from "@/lib/utils";
 
 export interface RichTextEditorProps {
   content: JSONContent;
   onChange: (json: JSONContent) => void;
+  className?: string;
 }
 
-export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
+export function RichTextEditor({
+  content,
+  onChange,
+  className,
+}: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: buildExtensions(),
     content,
     immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
-          "max-h-48 min-h-32 overflow-y-auto px-4 py-3 text-base leading-7 outline-none focus:outline-none",
+          "max-h-48 min-h-24 overflow-y-auto px-4 py-3 outline-none focus:outline-none",
       },
     },
     onUpdate: ({ editor }) => {
@@ -26,7 +32,9 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   });
 
   return (
-    <div className="min-h-32 rounded-lg border border-border bg-background shadow-sm transition-shadow focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
+    <div
+      className={cn("rounded-md border border-border bg-background", className)}
+    >
       <EditorContent editor={editor} />
     </div>
   );
