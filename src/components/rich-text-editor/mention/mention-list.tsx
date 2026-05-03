@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { MentionItem } from "@/lib/mention-items";
 import { cn } from "@/lib/utils";
 
@@ -83,35 +84,39 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
     );
 
     return (
-      <div className="w-64 overflow-hidden rounded-lg border border-border bg-popover shadow-lg">
-        <div className="max-h-40 overflow-y-auto p-1">
-          {items.length === 0 ? (
-            <p className="px-3 py-2 text-muted-foreground text-sm">
-              見つかりませんでした
-            </p>
-          ) : (
-            items.map((item, index) => (
-              <button
-                className={cn(
-                  "flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm",
-                  index === selectedIndex ? "bg-accent" : "hover:bg-accent/60",
-                )}
-                key={item.id}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  selectItem(index);
-                }}
-                onMouseEnter={() => setSelectedIndex(index)}
-                ref={(element) => {
-                  itemRefs.current[index] = element;
-                }}
-                type="button"
-              >
-                {item.label}
-              </button>
-            ))
-          )}
-        </div>
+      <div className="w-72 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
+        <ScrollArea className="max-h-72">
+          <div className="p-1">
+            {items.length === 0 ? (
+              <p className="px-3 py-2 text-muted-foreground text-sm">
+                見つかりませんでした
+              </p>
+            ) : (
+              items.map((item, index) => (
+                <button
+                  className={cn(
+                    "flex h-10 w-full items-center gap-2 rounded-md px-3 text-left text-sm outline-none transition-colors",
+                    index === selectedIndex
+                      ? "bg-accent"
+                      : "hover:bg-accent/60",
+                  )}
+                  key={item.id}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    selectItem(index);
+                  }}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  ref={(element) => {
+                    itemRefs.current[index] = element;
+                  }}
+                  type="button"
+                >
+                  <span className="truncate">{item.label}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </div>
     );
   },
