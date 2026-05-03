@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { MentionUser } from "@/lib/mention-users";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,10 @@ export interface MentionListRef {
 interface MentionListProps {
   command: (attrs: { id: string; label: string }) => void;
   items: MentionUser[];
+}
+
+function getAvatarFallback(name: string) {
+  return name.trim().charAt(0) || "?";
 }
 
 const MentionList = forwardRef<MentionListRef, MentionListProps>(
@@ -84,7 +89,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
     );
 
     return (
-      <div className="w-72 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
+      <div className="w-80 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
         <ScrollArea className="max-h-72">
           <div className="p-1">
             {items.length === 0 ? (
@@ -95,7 +100,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
               items.map((item, index) => (
                 <button
                   className={cn(
-                    "flex h-12 w-full flex-col items-start justify-center rounded-md px-3 text-left outline-none transition-colors",
+                    "flex h-14 w-full items-center gap-3 rounded-md px-3 text-left outline-none transition-colors",
                     index === selectedIndex
                       ? "bg-accent"
                       : "hover:bg-accent/60",
@@ -111,9 +116,19 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
                   }}
                   type="button"
                 >
-                  <span className="font-medium text-sm">{item.name}</span>
-                  <span className="text-muted-foreground text-xs">
-                    @{item.username}
+                  <Avatar className="size-8 shrink-0">
+                    <AvatarImage alt={item.name} src={item.avatarUrl} />
+                    <AvatarFallback>
+                      {getAvatarFallback(item.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium text-sm">
+                      {item.name}
+                    </span>
+                    <span className="block truncate text-muted-foreground text-xs">
+                      @{item.username}
+                    </span>
                   </span>
                 </button>
               ))
