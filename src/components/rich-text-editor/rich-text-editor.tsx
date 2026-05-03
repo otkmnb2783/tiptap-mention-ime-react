@@ -4,6 +4,7 @@ import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { buildExtensions } from "@/lib/rich-text-extensions";
 import { cn } from "@/lib/utils";
+import { Toolbar } from "./toolbar";
 
 export interface RichTextEditorProps {
   content: JSONContent;
@@ -23,7 +24,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "max-h-48 min-h-24 overflow-y-auto px-4 py-3 outline-none focus:outline-none",
+          "max-h-48 min-h-32 overflow-y-auto px-4 py-3 outline-none focus:outline-none",
       },
     },
     onUpdate: ({ editor }) => {
@@ -33,8 +34,12 @@ export function RichTextEditor({
 
   return (
     <div
-      className={cn("rounded-md border border-border bg-background", className)}
+      className={cn(
+        "min-h-32 overflow-hidden rounded-lg border border-border bg-background shadow-sm transition-shadow focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20",
+        className,
+      )}
     >
+      {editor ? <Toolbar editor={editor} /> : null}
       <EditorContent editor={editor} />
     </div>
   );
