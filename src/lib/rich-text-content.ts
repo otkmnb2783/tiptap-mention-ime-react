@@ -1,4 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
+import { generateText } from "@tiptap/core";
 import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
 
@@ -11,4 +12,10 @@ const extensions = [
 
 export function toHtml(content: JSONContent): string {
   return generateHTML(content, extensions);
+}
+
+export function extractText(content: JSONContent): string {
+  return generateText(content, extensions, {
+    blockSeparator: "\n",
+  }).trim();
 }

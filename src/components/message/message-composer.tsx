@@ -11,6 +11,7 @@ interface MessageComposerProps {
   editorKey: number;
   onChange: (content: JSONContent) => void;
   onPost: () => void;
+  submitting?: boolean;
 }
 
 export function MessageComposer({
@@ -18,6 +19,7 @@ export function MessageComposer({
   editorKey,
   onChange,
   onPost,
+  submitting = false,
 }: MessageComposerProps) {
   return (
     <div className="min-h-[196px] shrink-0 bg-background py-4">
@@ -25,9 +27,15 @@ export function MessageComposer({
         <RichTextEditor content={content} key={editorKey} onChange={onChange} />
         <div className="mt-3 flex items-center justify-between gap-3 px-1">
           <p className="text-muted-foreground text-xs">Enter で改行できます</p>
-          <Button className="gap-2" onClick={onPost} size="sm" type="button">
+          <Button
+            className="gap-2"
+            disabled={submitting}
+            onClick={onPost}
+            size="sm"
+            type="button"
+          >
             <Send className="h-4 w-4" />
-            投稿
+            {submitting ? "投稿中" : "投稿"}
           </Button>
         </div>
       </div>
