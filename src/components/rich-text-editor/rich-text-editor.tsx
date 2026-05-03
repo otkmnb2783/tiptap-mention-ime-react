@@ -3,8 +3,10 @@
 import Mention from "@tiptap/extension-mention";
 import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
+import { useEffect, useRef } from "react";
 
-import { mentionItems } from "@/lib/mention-items";
+import { useMentionUsers } from "@/hooks/use-mention-users";
+import type { MentionUser } from "@/lib/mention-users";
 import { buildExtensions } from "@/lib/rich-text-extensions";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +24,13 @@ export function RichTextEditor({
   content,
   onChange,
 }: RichTextEditorProps) {
+  const mentionUsersRef = useRef<MentionUser[]>([]);
+  const { error, isLoading, users } = useMentionUsers();
+
+  useEffect(() => {
+    mentionUsersRef.current = users;
+  }, [users]);
+
   const editor = useEditor({
     extensions: buildExtensions({
       additionalExtensions: [
@@ -29,7 +38,7 @@ export function RichTextEditor({
           HTMLAttributes: {
             class: "mention",
           },
-          suggestion: createMentionSuggestion(mentionItems),
+          suggestion: createMentionSuggestion(() => mentionUsersRef.current),
         }),
       ],
     }),
@@ -55,6 +64,14 @@ export function RichTextEditor({
     >
       {editor ? <Toolbar editor={editor} /> : null}
       <EditorContent editor={editor} />
+      {isLoading ? (
+        <p className="border-t px-4 py-2 text-muted-foreground text-xs">
+          Mention 候補を読み込み中...
+        </p>
+      ) : null}
+      {error ? (
+        <p className="border-t px-4 py-2 text-destructive text-xs">{error}</p>
+      ) : null}
     </div>
   );
 }

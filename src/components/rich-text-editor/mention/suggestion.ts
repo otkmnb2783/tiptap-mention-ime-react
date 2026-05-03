@@ -6,7 +6,7 @@ import type {
   SuggestionProps,
 } from "@tiptap/suggestion";
 
-import type { MentionItem } from "@/lib/mention-items";
+import type { MentionUser } from "@/lib/mention-users";
 import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 
 import MentionList, { type MentionListRef } from "./mention-list";
@@ -42,19 +42,30 @@ async function updatePosition(
   element.style.zIndex = "50";
 }
 
+function filterMentionUsers(users: MentionUser[], query: string) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) return users.slice(0, 10);
+
+  return users
+    .filter((user) => {
+      return (
+        user.name.toLowerCase().includes(normalizedQuery) ||
+        user.username.toLowerCase().includes(normalizedQuery)
+      );
+    })
+    .slice(0, 10);
+}
+
 export function createMentionSuggestion(
-  items: MentionItem[],
-): Partial<SuggestionOptions<MentionItem>> {
+  getUsers: () => MentionUser[],
+): Partial<SuggestionOptions<MentionUser>> {
   return {
     allowedPrefixes: [" ", "　"],
     char: "@",
 
     items: ({ query }) => {
-      return items
-        .filter((item) => {
-          return item.label.toLowerCase().includes(query.toLowerCase());
-        })
-        .slice(0, 10);
+      return filterMentionUsers(getUsers(), query);
     },
 
     render: () => {
@@ -89,7 +100,7 @@ export function createMentionSuggestion(
       };
 
       return {
-        onStart(props: SuggestionProps<MentionItem>) {
+        onStart(props: SuggestionProps<MentionUser>) {
           if (!props.clientRect) return;
 
           latestClientRect = props.clientRect;
@@ -107,15 +118,17 @@ export function createMentionSuggestion(
 
           document.body.appendChild(element);
 
-          resizeObserver = new ResizeObserver(() => {
-            schedulePositionUpdate();
-          });
-          resizeObserver.observe(element);
+          if (typeof ResizeObserver !== "undefined") {
+            resizeObserver = new ResizeObserver(() => {
+              schedulePositionUpdate();
+            });
+            resizeObserver.observe(element);
+          }
 
           schedulePositionUpdate();
         },
 
-        onUpdate(props: SuggestionProps<MentionItem>) {
+        onUpdate(props: SuggestionProps<MentionUser>) {
           latestClientRect = props.clientRect;
           component?.updateProps(props);
           schedulePositionUpdate();

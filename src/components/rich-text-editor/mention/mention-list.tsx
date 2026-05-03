@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { MentionItem } from "@/lib/mention-items";
+import type { MentionUser } from "@/lib/mention-users";
 import { cn } from "@/lib/utils";
 
 export interface MentionListRef {
@@ -19,7 +19,7 @@ export interface MentionListRef {
 
 interface MentionListProps {
   command: (attrs: { id: string; label: string }) => void;
-  items: MentionItem[];
+  items: MentionUser[];
 }
 
 const MentionList = forwardRef<MentionListRef, MentionListProps>(
@@ -47,7 +47,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
 
         if (!item) return;
 
-        command({ id: item.id, label: item.label });
+        command({ id: item.id, label: item.name });
       },
       [command, items],
     );
@@ -89,13 +89,13 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
           <div className="p-1">
             {items.length === 0 ? (
               <p className="px-3 py-2 text-muted-foreground text-sm">
-                見つかりませんでした
+                候補がありません
               </p>
             ) : (
               items.map((item, index) => (
                 <button
                   className={cn(
-                    "flex h-10 w-full items-center gap-2 rounded-md px-3 text-left text-sm outline-none transition-colors",
+                    "flex h-12 w-full flex-col items-start justify-center rounded-md px-3 text-left outline-none transition-colors",
                     index === selectedIndex
                       ? "bg-accent"
                       : "hover:bg-accent/60",
@@ -111,7 +111,10 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
                   }}
                   type="button"
                 >
-                  <span className="truncate">{item.label}</span>
+                  <span className="font-medium text-sm">{item.name}</span>
+                  <span className="text-muted-foreground text-xs">
+                    @{item.username}
+                  </span>
                 </button>
               ))
             )}
