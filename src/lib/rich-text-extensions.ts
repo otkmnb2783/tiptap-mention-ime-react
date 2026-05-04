@@ -53,6 +53,12 @@ export function buildExtensions({
           class: "my-1",
         },
       },
+      code: {
+        HTMLAttributes: {
+          class:
+            "rounded bg-muted px-1 py-0.5 font-mono text-muted-foreground text-sm",
+        },
+      },
     }),
     Emoji.configure({
       emojis: gitHubEmojis,
