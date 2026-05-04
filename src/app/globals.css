@@ -143,3 +143,18 @@
   text-decoration-line: underline;
   text-underline-offset: 3px;
 }
+
+.EmojiPickerReact {
+  --epr-bg-color: var(--popover);
+  --epr-category-label-bg-color: var(--popover);
+  --epr-text-color: var(--popover-foreground);
+  --epr-hover-bg-color: var(--accent);
+  --epr-focus-bg-color: var(--accent);
+  --epr-highlight-color: var(--primary);
+  border: 0;
+}
+
+.rte-emoji {
+  display: inline-block;
+  line-height: 1;
+}

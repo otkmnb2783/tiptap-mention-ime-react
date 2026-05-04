@@ -1,4 +1,5 @@
 import type { Extensions } from "@tiptap/core";
+import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import StarterKit from "@tiptap/starter-kit";
 
 export interface BuildExtensionsOptions {
@@ -48,6 +49,12 @@ export function buildExtensions({
         HTMLAttributes: {
           class: "my-1",
         },
+      },
+    }),
+    Emoji.configure({
+      emojis: gitHubEmojis,
+      HTMLAttributes: {
+        class: "rte-emoji",
       },
     }),
     ...additionalExtensions,
