@@ -90,7 +90,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
 
     return (
       <div className="w-80 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
-        <ScrollArea className="max-h-72">
+        <ScrollArea className={cn("max-h-72", items.length > 4 && "h-72")}>
           <div className="p-1">
             {items.length === 0 ? (
               <p className="px-3 py-2 text-muted-foreground text-sm">
