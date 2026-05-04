@@ -9,6 +9,7 @@ import type { MentionUser } from "@/lib/mention-users";
 import { buildExtensions } from "@/lib/rich-text-extensions";
 import { cn } from "@/lib/utils";
 
+import { emojiSuggestion } from "./emoji/emoji-suggestion";
 import type { ImeMentionController } from "./mention/suggestion";
 import { buildMentionExtensions } from "./plugins/build-mention-extension";
 import { Toolbar } from "./toolbar";
@@ -44,6 +45,7 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: buildExtensions({
       additionalExtensions: mentionExtensions,
+      emojiSuggestion,
     }),
     content,
     immediatelyRender: false,

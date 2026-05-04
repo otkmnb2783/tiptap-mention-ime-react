@@ -1,13 +1,16 @@
 import type { Extensions } from "@tiptap/core";
+import type { EmojiOptions } from "@tiptap/extension-emoji";
 import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import StarterKit from "@tiptap/starter-kit";
 
 export interface BuildExtensionsOptions {
   additionalExtensions?: Extensions;
+  emojiSuggestion?: EmojiOptions["suggestion"];
 }
 
 export function buildExtensions({
   additionalExtensions = [],
+  emojiSuggestion,
 }: BuildExtensionsOptions = {}): Extensions {
   return [
     StarterKit.configure({
@@ -53,6 +56,7 @@ export function buildExtensions({
     }),
     Emoji.configure({
       emojis: gitHubEmojis,
+      ...(emojiSuggestion ? { suggestion: emojiSuggestion } : {}),
       HTMLAttributes: {
         class: "rte-emoji",
       },
