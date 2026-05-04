@@ -12,6 +12,17 @@ export function buildExtensions({
     StarterKit.configure({
       heading: false,
       horizontalRule: false,
+      link: {
+        autolink: true,
+        defaultProtocol: "https",
+        linkOnPaste: true,
+        openOnClick: false,
+        HTMLAttributes: {
+          class: "rte-link",
+          rel: "noopener noreferrer",
+          target: "_blank",
+        },
+      },
       paragraph: {
         HTMLAttributes: {
           class: "my-0.5",

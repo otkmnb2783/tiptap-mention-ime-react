@@ -11,6 +11,8 @@ import {
 
 import { Toggle } from "@/components/ui/toggle";
 
+import { LinkPopover } from "./link-popover";
+
 interface ToolbarProps {
   editor: Editor;
 }
@@ -45,6 +47,7 @@ export function Toolbar({ editor }: ToolbarProps) {
       >
         <Strikethrough className="h-4 w-4" />
       </Toggle>
+      <LinkPopover editor={editor} />
       <Toggle
         size="sm"
         pressed={editor.isActive("bulletList")}

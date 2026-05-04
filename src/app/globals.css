@@ -136,3 +136,10 @@
   padding: 0.05rem 0.25rem;
   font-weight: 500;
 }
+
+.rte-link,
+.ProseMirror a {
+  color: var(--primary);
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+}
